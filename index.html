@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Jobflow — Layoff Calculator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,300&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --beige-50: #faf8f5;
+      --beige-100: #f5f0e8;
+      --beige-200: #ece4d5;
+      --beige-300: #ddd0bb;
+      --warm-800: #3d2f1e;
+      --warm-700: #5a4232;
+      --warm-600: #7a5c44;
+      --coral: #e8623a;
+      --coral-light: #f07d5a;
+      --coral-dark: #c94e28;
+      --coral-muted: #f5ddd6;
+      --text-primary: #2d2318;
+      --text-secondary: #6b5744;
+      --text-muted: #9a8272;
+      --card-bg: #ffffff;
+      --shadow-sm: 0 2px 8px rgba(61,47,30,0.06);
+      --shadow-md: 0 6px 24px rgba(61,47,30,0.10);
+      --shadow-lg: 0 16px 48px rgba(61,47,30,0.13);
+      --radius: 16px;
+      --radius-sm: 10px;
+      --transition: 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--beige-50);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ─── NAV ──────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(250,248,245,0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--beige-200);
+      transition: box-shadow var(--transition);
+    }
+    nav.scrolled { box-shadow: var(--shadow-sm); }
+
+    .nav-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-family: 'Fraunces', serif;
+      font-weight: 600;
+      font-size: 1.25rem;
+      color: var(--text-primary);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+    .nav-logo span {
+      color: var(--coral);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.875rem;
+      font-weight: 400;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color var(--transition);
+    }
+    .nav-links a:hover { color: var(--text-primary); }
+
+    .nav-cta {
+      background: var(--coral);
+      color: #fff !important;
+      padding: 9px 20px;
+      border-radius: 50px;
+      font-weight: 500 !important;
+      font-size: 0.875rem;
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition) !important;
+    }
+    .nav-cta:hover {
+      background: var(--coral-dark) !important;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(232,98,58,0.35) !important;
+      color: #fff !important;
+    }
+
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 8px;
+      border: none;
+      background: none;
+    }
+    .nav-hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--text-primary);
+      border-radius: 2px;
+      transition: all var(--transition);
+    }
+
+    /* ─── HERO ─────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      padding: 120px 24px 80px;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 60% at 80% 20%, rgba(232,98,58,0.09) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 40% at 10% 80%, rgba(232,98,58,0.06) 0%, transparent 60%),
+        var(--beige-50);
+      z-index: 0;
+    }
+
+    /* Decorative floating shapes */
+    .hero-shape {
+      position: absolute;
+      border-radius: 50%;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .hero-shape-1 {
+      width: 480px; height: 480px;
+      top: -120px; right: -80px;
+      background: radial-gradient(circle, rgba(232,98,58,0.07), transparent 70%);
+      animation: floatSlow 8s ease-in-out infinite;
+    }
+    .hero-shape-2 {
+      width: 280px; height: 280px;
+      bottom: 40px; left: -60px;
+      background: radial-gradient(circle, rgba(232,98,58,0.05), transparent 70%);
+      animation: floatSlow 10s ease-in-out infinite reverse;
+    }
+
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px) scale(1); }
+      50% { transform: translateY(-20px) scale(1.03); }
+    }
+
+    .hero-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--coral-muted);
+      border: 1px solid rgba(232,98,58,0.2);
+      color: var(--coral-dark);
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 50px;
+      margin-bottom: 24px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.1s ease forwards;
+    }
+    .hero-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--coral);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.3); }
+    }
+
+    .hero-eyebrow {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.2s ease forwards;
+    }
+
+    h1 {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(2.4rem, 5vw, 3.8rem);
+      font-weight: 500;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.3s ease forwards;
+    }
+    h1 em {
+      font-style: italic;
+      font-weight: 300;
+      color: var(--coral);
+    }
+
+    .hero-tagline {
+      font-size: 1.1rem;
+      font-weight: 300;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 40px;
+      max-width: 480px;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.45s ease forwards;
+    }
+
+    /* ─── SIGNUP CARD ──────────────────────── */
+    .signup-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 40px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--beige-200);
+      position: relative;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.5s ease forwards;
+    }
+
+    .signup-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--coral), var(--coral-light));
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+
+    .signup-card h2 {
+      font-family: 'Fraunces', serif;
+      font-size: 1.5rem;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .signup-card p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+      line-height: 1.6;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 7px;
+      letter-spacing: 0.02em;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 13px 16px;
+      border: 1.5px solid var(--beige-200);
+      border-radius: var(--radius-sm);
+      background: var(--beige-50);
+      color: var(--text-primary);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .form-group input::placeholder { color: var(--text-muted); }
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: var(--coral);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(232,98,58,0.12);
+    }
+
+    .select-wrapper {
+      position: relative;
+    }
+    .select-wrapper::after {
+      content: '▾';
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+      font-size: 0.75rem;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 15px 24px;
+      background: var(--coral);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+      margin-top: 8px;
+      letter-spacing: 0.01em;
+    }
+    .btn-primary:hover {
+      background: var(--coral-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(232,98,58,0.4);
+    }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:focus-visible {
+      outline: 3px solid rgba(232,98,58,0.5);
+      outline-offset: 2px;
+    }
+
+    .form-disclaimer {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 16px;
+    }
+    .form-disclaimer a {
+      color: var(--text-secondary);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    /* Success state */
+    .success-msg {
+      display: none;
+      text-align: center;
+      padding: 16px 0 8px;
+    }
+    .success-msg .success-icon {
+      width: 52px; height: 52px;
+      background: rgba(232,98,58,0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      font-size: 1.4rem;
+    }
+    .success-msg h3 {
+      font-family: 'Fraunces', serif;
+      font-size: 1.3rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    .success-msg p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 0;
+    }
+
+    /* ─── SOCIAL PROOF ─────────────────────── */
+    .social-proof {
+      margin-top: 40px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.65s ease forwards;
+    }
+    .sp-avatars {
+      display: flex;
+    }
+    .sp-avatars span {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 2.5px solid var(--beige-50);
+      background: var(--beige-200);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-left: -8px;
+    }
+    .sp-avatars span:first-child { margin-left: 0; }
+
+    .sp-text {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+    .sp-text strong {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    /* ─── TRUST BAR ────────────────────────── */
+    .trust-bar {
+      background: var(--beige-100);
+      border-top: 1px solid var(--beige-200);
+      border-bottom: 1px solid var(--beige-200);
+      padding: 20px 24px;
+    }
+    .trust-bar-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+    .trust-item .icon {
+      width: 28px; height: 28px;
+      background: var(--coral-muted);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+    }
+
+    /* ─── VALUE PROPS ──────────────────────── */
+    .section {
+      padding: 100px 24px;
+    }
+    .section-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--coral);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(1.9rem, 3.5vw, 2.8rem);
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      color: var(--text-primary);
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .section-title em {
+      font-style: italic;
+      font-weight: 300;
+      color: var(--coral);
+    }
+
+    .section-subtitle {
+      font-size: 1rem;
+      font-weight: 300;
+      color: var(--text-secondary);
+      max-width: 540px;
+      line-height: 1.7;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 60px;
+    }
+
+    .feature-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 32px;
+      border: 1px solid var(--beige-200);
+      box-shadow: var(--shadow-sm);
+      transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+    }
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+      border-color: rgba(232,98,58,0.2);
+    }
+
+    .feature-icon {
+      width: 48px; height: 48px;
+      background: var(--coral-muted);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      margin-bottom: 20px;
+    }
+
+    .feature-title {
+      font-family: 'Fraunces', serif;
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+      letter-spacing: -0.02em;
+    }
+
+    .feature-desc {
+      font-size: 0.9rem;
+      font-weight: 300;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    /* ─── HOW IT WORKS ─────────────────────── */
+    .how-it-works {
+      background: var(--beige-100);
+      border-top: 1px solid var(--beige-200);
+      border-bottom: 1px solid var(--beige-200);
+    }
+
+    .steps-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 48px;
+      margin-top: 60px;
+      position: relative;
+    }
+
+    .steps-row::before {
+      content: '';
+      position: absolute;
+      top: 32px; left: 15%; right: 15%;
+      height: 1.5px;
+      background: linear-gradient(90deg, transparent, var(--beige-300), transparent);
+      pointer-events: none;
+    }
+
+    .step {
+      text-align: center;
+      position: relative;
+    }
+
+    .step-num {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: var(--card-bg);
+      border: 2px solid var(--beige-200);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-family: 'Fraunces', serif;
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: var(--coral);
+      box-shadow: var(--shadow-sm);
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    .step:hover .step-num {
+      border-color: rgba(232,98,58,0.3);
+      box-shadow: var(--shadow-md);
+    }
+
+    .step-title {
+      font-family: 'Fraunces', serif;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+      letter-spacing: -0.02em;
+    }
+
+    .step-desc {
+      font-size: 0.875rem;
+      font-weight: 300;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      max-width: 240px;
+      margin: 0 auto;
+    }
+
+    /* ─── DASHBOARD PREVIEW ──────────────────── */
+    .preview-section {
+      padding: 100px 24px;
+      overflow: hidden;
+    }
+    .preview-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .preview-ui {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--beige-200);
+      overflow: hidden;
+      transform: perspective(1000px) rotateY(-4deg) rotateX(2deg);
+      transition: transform 0.5s ease;
+    }
+    .preview-ui:hover {
+      transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
+    }
+
+    .preview-header {
+      background: var(--beige-100);
+      border-bottom: 1px solid var(--beige-200);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .preview-dots span {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--beige-300);
+      display: inline-block;
+      margin-right: 5px;
+    }
+    .preview-dots span:nth-child(1) { background: #f9c74f; }
+    .preview-dots span:nth-child(2) { background: #90be6d; }
+    .preview-dots span:nth-child(3) { background: #f94144; }
+    .preview-title-bar {
+      flex: 1;
+      background: var(--beige-200);
+      border-radius: 6px;
+      height: 22px;
+    }
+
+    .preview-body {
+      padding: 24px;
+    }
+
+    .preview-metric-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .preview-metric {
+      background: var(--beige-50);
+      border-radius: 10px;
+      padding: 14px;
+      border: 1px solid var(--beige-200);
+    }
+    .preview-metric .pm-label {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .preview-metric .pm-val {
+      font-family: 'Fraunces', serif;
+      font-size: 1.3rem;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+    .preview-metric .pm-val.coral { color: var(--coral); }
+
+    .preview-bar {
+      background: var(--beige-50);
+      border-radius: 10px;
+      padding: 16px;
+      border: 1px solid var(--beige-200);
+      margin-bottom: 12px;
+    }
+    .preview-bar-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .preview-bar-track {
+      height: 8px;
+      background: var(--beige-200);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .preview-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--coral), var(--coral-light));
+      border-radius: 4px;
+      transition: width 1s ease;
+    }
+
+    .preview-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .preview-btn {
+      flex: 1;
+      height: 36px;
+      border-radius: 8px;
+      background: var(--coral);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .preview-btn.ghost {
+      background: var(--beige-100);
+      border: 1px solid var(--beige-200);
+    }
+
+    /* ─── TESTIMONIALS ────────────────────── */
+    .testimonials { padding: 100px 24px; }
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 60px;
+    }
+    .testimonial-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 32px;
+      border: 1px solid var(--beige-200);
+      box-shadow: var(--shadow-sm);
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    .testimonial-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+    .tc-quote {
+      font-family: 'Fraunces', serif;
+      font-size: 1.1rem;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--text-primary);
+      line-height: 1.65;
+      margin-bottom: 24px;
+    }
+    .tc-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .tc-avatar {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--beige-200);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 500;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+    .tc-name {
+      font-weight: 500;
+      font-size: 0.875rem;
+      color: var(--text-primary);
+    }
+    .tc-role {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .tc-stars {
+      color: var(--coral);
+      font-size: 0.75rem;
+      margin-bottom: 16px;
+    }
+
+    /* ─── FAQ ─────────────────────────────── */
+    .faq-section {
+      padding: 100px 24px;
+      background: var(--beige-100);
+      border-top: 1px solid var(--beige-200);
+    }
+    .faq-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px 80px;
+      margin-top: 60px;
+    }
+    .faq-item {}
+    .faq-q {
+      font-family: 'Fraunces', serif;
+      font-size: 1.05rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+      letter-spacing: -0.02em;
+    }
+    .faq-a {
+      font-size: 0.875rem;
+      font-weight: 300;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    /* ─── FINAL CTA ───────────────────────── */
+    .final-cta {
+      padding: 100px 24px;
+    }
+    .final-cta-card {
+      max-width: 720px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 64px 56px;
+      text-align: center;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--beige-200);
+      position: relative;
+      overflow: hidden;
+    }
+    .final-cta-card::before {
+      content: '';
+      position: absolute;
+      top: -80px; right: -80px;
+      width: 280px; height: 280px;
+      background: radial-gradient(circle, rgba(232,98,58,0.08), transparent 70%);
+      border-radius: 50%;
+    }
+    .final-cta-card::after {
+      content: '';
+      position: absolute;
+      bottom: -60px; left: -60px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(232,98,58,0.06), transparent 70%);
+      border-radius: 50%;
+    }
+    .final-cta-card .section-title { margin-bottom: 16px; }
+    .final-cta-card .section-subtitle {
+      margin: 0 auto 40px;
+      text-align: center;
+    }
+
+    .final-form {
+      display: flex;
+      gap: 12px;
+      max-width: 420px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+    .final-form input {
+      flex: 1;
+      padding: 14px 18px;
+      border: 1.5px solid var(--beige-200);
+      border-radius: var(--radius-sm);
+      background: var(--beige-50);
+      color: var(--text-primary);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    .final-form input:focus {
+      border-color: var(--coral);
+      box-shadow: 0 0 0 3px rgba(232,98,58,0.12);
+    }
+    .final-form button {
+      padding: 14px 24px;
+      background: var(--coral);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      font-size: 0.95rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+    }
+    .final-form button:hover {
+      background: var(--coral-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(232,98,58,0.4);
+    }
+
+    /* ─── FOOTER ──────────────────────────── */
+    footer {
+      background: var(--warm-800);
+      padding: 48px 24px;
+    }
+    .footer-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .footer-logo {
+      font-family: 'Fraunces', serif;
+      font-size: 1.2rem;
+      color: rgba(255,255,255,0.85);
+      font-weight: 500;
+    }
+    .footer-logo span { color: var(--coral-light); }
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+    }
+    .footer-links a {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.45);
+      text-decoration: none;
+      transition: color var(--transition);
+    }
+    .footer-links a:hover { color: rgba(255,255,255,0.8); }
+    .footer-copy {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.3);
+      width: 100%;
+      margin-top: 24px;
+      text-align: center;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding-top: 24px;
+    }
+
+    /* ─── ANIMATIONS ──────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+
+    /* ─── MOBILE NAV ──────────────────────── */
+    .mobile-menu {
+      position: fixed;
+      top: 64px; left: 0; right: 0;
+      background: rgba(250,248,245,0.98);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--beige-200);
+      padding: 20px 24px 28px;
+      z-index: 99;
+      transform: translateY(-110%);
+      transition: transform var(--transition);
+      box-shadow: var(--shadow-md);
+    }
+    .mobile-menu.open { transform: translateY(0); }
+    .mobile-menu ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .mobile-menu a {
+      display: block;
+      padding: 12px 0;
+      font-size: 1rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-bottom: 1px solid var(--beige-200);
+      transition: color var(--transition);
+    }
+    .mobile-menu a:hover { color: var(--text-primary); }
+    .mobile-menu .nav-cta {
+      display: block;
+      text-align: center;
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: var(--radius-sm);
+    }
+
+    /* ─── RESPONSIVE ──────────────────────── */
+    @media (max-width: 900px) {
+      .hero-inner {
+        grid-template-columns: 1fr;
+        gap: 48px;
+      }
+      .features-grid,
+      .steps-row,
+      .testimonials-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      .steps-row::before { display: none; }
+      .faq-grid { grid-template-columns: 1fr; gap: 28px; }
+      .preview-inner { grid-template-columns: 1fr; gap: 48px; }
+      .preview-ui { transform: none; }
+      .preview-ui:hover { transform: none; }
+      .nav-links { display: none; }
+      .nav-hamburger { display: flex; }
+      .final-form { flex-direction: column; }
+      .final-cta-card { padding: 40px 28px; }
+      .hero { min-height: auto; padding: 100px 24px 60px; }
+    }
+
+    @media (max-width: 600px) {
+      .section { padding: 72px 20px; }
+      .trust-bar-inner { gap: 20px; }
+      .preview-metric-row { grid-template-columns: 1fr 1fr; }
+      .preview-metric:last-child { grid-column: 1 / -1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── NAVIGATION ──────────────────────── -->
+  <nav id="nav" role="navigation" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo" aria-label="Jobflow home">Job<span>flow</span></a>
+
+      <ul class="nav-links" role="list">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#how-it-works">How it works</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#signup" class="nav-cta">Get early access</a></li>
+      </ul>
+
+      <button class="nav-hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobile-menu" role="dialog" aria-label="Mobile navigation">
+    <ul>
+      <li><a href="#features" class="mobile-link">Features</a></li>
+      <li><a href="#how-it-works" class="mobile-link">How it works</a></li>
+      <li><a href="#faq" class="mobile-link">FAQ</a></li>
+      <li><a href="#signup" class="nav-cta mobile-link">Get early access →</a></li>
+    </ul>
+  </div>
+
+  <!-- ─── HERO ─────────────────────────────── -->
+  <section class="hero" aria-labelledby="hero-heading">
+    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="hero-shape hero-shape-1" aria-hidden="true"></div>
+    <div class="hero-shape hero-shape-2" aria-hidden="true"></div>
+
+    <div class="hero-inner">
+      <div class="hero-content">
+        <div class="hero-badge" role="status" aria-label="Product status">Coming soon — join the waitlist</div>
+        <p class="hero-eyebrow">Jobflow · Layoff Calculator</p>
+        <h1 id="hero-heading">Know exactly<br>what comes <em>next.</em></h1>
+        <p class="hero-tagline">
+          Getting laid off is stressful. Figuring out your finances, benefits, and next move shouldn't be. The Layoff Calculator gives tech professionals a clear, personalized action plan — so you can move forward with confidence.
+        </p>
+        <div class="social-proof" aria-label="Waitlist signups">
+          <div class="sp-avatars" aria-hidden="true">
+            <span title="[REPLACE: Avatar initials]">MK</span>
+            <span title="[REPLACE: Avatar initials]">JS</span>
+            <span title="[REPLACE: Avatar initials]">AL</span>
+            <span title="[REPLACE: Avatar initials]">+</span>
+          </div>
+          <p class="sp-text"><strong>[REPLACE: e.g. 400+] tech professionals</strong><br>already on the waitlist</p>
+        </div>
+      </div>
+
+      <div id="signup">
+        <div class="signup-card" role="region" aria-labelledby="form-heading">
+          <div class="signup-form-content">
+            <h2 id="form-heading">Get early access</h2>
+            <p>Be first to try the Layoff Calculator when we launch. No spam, ever.</p>
+
+            <form id="hero-form" novalidate>
+              <div class="form-group">
+                <label for="hero-name">Your name</label>
+                <input type="text" id="hero-name" name="name" placeholder="[e.g. Alex Chen]" autocomplete="name" required />
+              </div>
+              <div class="form-group">
+                <label for="hero-email">Work or personal email</label>
+                <input type="email" id="hero-email" name="email" placeholder="[e.g. alex@company.com]" autocomplete="email" required />
+              </div>
+              <div class="form-group">
+                <label for="hero-role">Your situation</label>
+                <div class="select-wrapper">
+                  <select id="hero-role" name="role">
+                    <option value="">Select what describes you best</option>
+                    <option value="laid-off">I was recently laid off</option>
+                    <option value="at-risk">I'm worried about my job security</option>
+                    <option value="exploring">I want to switch jobs</option>
+                    <option value="planning">I'm planning ahead</option>
+                  </select>
+                </div>
+              </div>
+              <button type="submit" class="btn-primary">Notify me when it's ready →</button>
+              <p class="form-disclaimer">By signing up you agree to our <a href="#" tabindex="0">Privacy Policy</a>. We'll only email you about Jobflow.</p>
+            </form>
+          </div>
+          <div class="success-msg" id="success-msg" role="alert" aria-live="polite">
+            <div class="success-icon" aria-hidden="true">🎉</div>
+            <h3>You're on the list!</h3>
+            <p>We'll email you at <strong id="confirmed-email"></strong> as soon as the Layoff Calculator is ready to try.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── TRUST BAR ─────────────────────────── -->
+  <div class="trust-bar" role="region" aria-label="Trust indicators">
+    <div class="trust-bar-inner">
+      <div class="trust-item">
+        <div class="icon" aria-hidden="true">🔒</div>
+        <span>No data sold. Ever.</span>
+      </div>
+      <div class="trust-item">
+        <div class="icon" aria-hidden="true">⚡</div>
+        <span>Built by career experts</span>
+      </div>
+      <div class="trust-item">
+        <div class="icon" aria-hidden="true">🎯</div>
+        <span>Personalized to your situation</span>
+      </div>
+      <div class="trust-item">
+        <div class="icon" aria-hidden="true">📧</div>
+        <span>Unsubscribe anytime</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── FEATURES ──────────────────────────── -->
+  <section class="section" id="features" aria-labelledby="features-heading">
+    <div class="section-inner">
+      <p class="section-label reveal">What it does</p>
+      <h2 class="section-title reveal reveal-delay-1" id="features-heading">Everything you need to<br><em>navigate what's next</em></h2>
+      <p class="section-subtitle reveal reveal-delay-2">From severance calculations to job search timelines — it's all in one place, built specifically for tech professionals.</p>
+
+      <div class="features-grid">
+        <div class="feature-card reveal">
+          <div class="feature-icon" aria-hidden="true">💰</div>
+          <h3 class="feature-title">Severance & Benefits Calculator</h3>
+          <p class="feature-desc">Enter your comp details and instantly see what severance you're entitled to, how long your COBRA coverage lasts, and what your runway looks like.</p>
+        </div>
+        <div class="feature-card reveal reveal-delay-1">
+          <div class="feature-icon" aria-hidden="true">🗓️</div>
+          <h3 class="feature-title">Personalized Job Search Timeline</h3>
+          <p class="feature-desc">Based on your role, experience level, and market conditions, get a realistic timeline for your job search — with weekly milestones to keep you on track.</p>
+        </div>
+        <div class="feature-card reveal reveal-delay-2">
+          <div class="feature-icon" aria-hidden="true">📋</div>
+          <h3 class="feature-title">Your Next-Step Action Plan</h3>
+          <p class="feature-desc">A prioritized checklist of what to do in the first 30, 60, and 90 days — from filing for unemployment to updating your LinkedIn and targeting the right roles.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon" aria-hidden="true">📊</div>
+          <h3 class="feature-title">Market Salary Benchmarks</h3>
+          <p class="feature-desc">See what people in your role, level, and location are earning right now — so you never undersell yourself in your next negotiation.</p>
+        </div>
+        <div class="feature-card reveal reveal-delay-1">
+          <div class="feature-icon" aria-hidden="true">🧭</div>
+          <h3 class="feature-title">Role Pivot Explorer</h3>
+          <p class="feature-desc">Curious about adjacent roles? Explore related job titles, required skill gaps, and typical comp ranges to find paths you might not have considered.</p>
+        </div>
+        <div class="feature-card reveal reveal-delay-2">
+          <div class="feature-icon" aria-hidden="true">🔔</div>
+          <h3 class="feature-title">Real-Time Job Alerts</h3>
+          <p class="feature-desc">[COMING SOON] Get notified the moment relevant roles open at companies that match your target list — filtered by your preferences.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── HOW IT WORKS ──────────────────────── -->
+  <section class="section how-it-works" id="how-it-works" aria-labelledby="hiw-heading">
+    <div class="section-inner">
+      <p class="section-label reveal">How it works</p>
+      <h2 class="section-title reveal reveal-delay-1" id="hiw-heading">From laid off to<br><em>locked in</em> — in minutes</h2>
+      <p class="section-subtitle reveal reveal-delay-2">No lengthy onboarding. Just answer a few questions and get your personalized plan.</p>
+
+      <div class="steps-row">
+        <div class="step reveal">
+          <div class="step-num" aria-label="Step 1">1</div>
+          <h3 class="step-title">Enter your details</h3>
+          <p class="step-desc">Share your role, salary, years of experience, and layoff date. Takes under 2 minutes.</p>
+        </div>
+        <div class="step reveal reveal-delay-1">
+          <div class="step-num" aria-label="Step 2">2</div>
+          <h3 class="step-title">Get your full picture</h3>
+          <p class="step-desc">See your severance estimate, benefit timelines, financial runway, and market context — instantly.</p>
+        </div>
+        <div class="step reveal reveal-delay-2">
+          <div class="step-num" aria-label="Step 3">3</div>
+          <h3 class="step-title">Follow your action plan</h3>
+          <p class="step-desc">Work through a clear, prioritized checklist built for your specific situation. No guesswork.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── DASHBOARD PREVIEW ──────────────────── -->
+  <section class="preview-section" aria-labelledby="preview-heading">
+    <div class="preview-inner">
+      <div>
+        <p class="section-label reveal">The dashboard</p>
+        <h2 class="section-title reveal reveal-delay-1" id="preview-heading">Clarity when you<br>need it <em>most</em></h2>
+        <p class="section-subtitle reveal reveal-delay-2" style="margin-bottom: 32px;">A calm, focused dashboard that puts the most important numbers front and center — your runway, your next steps, and your market value.</p>
+        <div class="reveal reveal-delay-3">
+          <a href="#signup" class="btn-primary" style="display:inline-block; width:auto; padding: 14px 28px; text-decoration:none; border-radius: 10px; font-size:0.95rem;">Join the waitlist →</a>
+        </div>
+      </div>
+
+      <!-- Illustrative UI Preview -->
+      <div class="preview-ui reveal" aria-label="Layoff Calculator dashboard preview" role="img">
+        <div class="preview-header" aria-hidden="true">
+          <div class="preview-dots">
+            <span></span><span></span><span></span>
+          </div>
+          <div class="preview-title-bar"></div>
+        </div>
+        <div class="preview-body" aria-hidden="true">
+          <div class="preview-metric-row">
+            <div class="preview-metric">
+              <div class="pm-label">Runway</div>
+              <div class="pm-val coral">[X] mo.</div>
+            </div>
+            <div class="preview-metric">
+              <div class="pm-label">Severance est.</div>
+              <div class="pm-val">$[XX,XXX]</div>
+            </div>
+            <div class="preview-metric">
+              <div class="pm-label">COBRA ends</div>
+              <div class="pm-val">[MMM YY]</div>
+            </div>
+          </div>
+          <div class="preview-bar">
+            <div class="preview-bar-label">
+              <span>Job search progress</span>
+              <span style="color:var(--coral)">Week [X] of [X]</span>
+            </div>
+            <div class="preview-bar-track">
+              <div class="preview-bar-fill" style="width:38%"></div>
+            </div>
+          </div>
+          <div class="preview-bar">
+            <div class="preview-bar-label">
+              <span>Next steps completed</span>
+              <span style="color:var(--coral)">[X] / [X] done</span>
+            </div>
+            <div class="preview-bar-track">
+              <div class="preview-bar-fill" style="width:60%"></div>
+            </div>
+          </div>
+          <div class="preview-actions">
+            <div class="preview-btn" style="height:34px; border-radius:8px;"></div>
+            <div class="preview-btn ghost" style="height:34px; border-radius:8px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── TESTIMONIALS ──────────────────────── -->
+  <section class="testimonials" aria-labelledby="testimonials-heading">
+    <div class="section-inner">
+      <p class="section-label reveal">Early feedback</p>
+      <h2 class="section-title reveal reveal-delay-1" id="testimonials-heading">What people are <em>saying</em></h2>
+      <p class="section-subtitle reveal reveal-delay-2">[REPLACE: Update with real testimonials once available from beta users]</p>
+
+      <div class="testimonials-grid">
+        <div class="testimonial-card reveal">
+          <div class="tc-stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <p class="tc-quote">"[REPLACE: Testimonial quote from a beta user — ideally about how the tool helped them feel prepared and in control after a layoff.]"</p>
+          <div class="tc-author">
+            <div class="tc-avatar" aria-hidden="true">[XX]</div>
+            <div>
+              <div class="tc-name">[Full Name]</div>
+              <div class="tc-role">[Job Title] · [Company Type or City]</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card reveal reveal-delay-1">
+          <div class="tc-stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <p class="tc-quote">"[REPLACE: Testimonial quote — ideally focused on the specific value of the severance calculator or action plan feature.]"</p>
+          <div class="tc-author">
+            <div class="tc-avatar" aria-hidden="true">[XX]</div>
+            <div>
+              <div class="tc-name">[Full Name]</div>
+              <div class="tc-role">[Job Title] · [Company Type or City]</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card reveal reveal-delay-2">
+          <div class="tc-stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <p class="tc-quote">"[REPLACE: Testimonial quote — ideally about how the tool reduced stress and gave clarity during a tough transition period.]"</p>
+          <div class="tc-author">
+            <div class="tc-avatar" aria-hidden="true">[XX]</div>
+            <div>
+              <div class="tc-name">[Full Name]</div>
+              <div class="tc-role">[Job Title] · [Company Type or City]</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FAQ ───────────────────────────────── -->
+  <section class="section faq-section" id="faq" aria-labelledby="faq-heading">
+    <div class="section-inner">
+      <p class="section-label reveal">Questions</p>
+      <h2 class="section-title reveal reveal-delay-1" id="faq-heading">Common <em>questions</em></h2>
+
+      <div class="faq-grid">
+        <div class="faq-item reveal">
+          <h3 class="faq-q">When will the Layoff Calculator be ready?</h3>
+          <p class="faq-a">We're currently in development and plan to begin beta testing soon. Sign up for the waitlist and you'll be among the first to get access.</p>
+        </div>
+        <div class="faq-item reveal reveal-delay-1">
+          <h3 class="faq-q">Is it free to use?</h3>
+          <p class="faq-a">The core calculator and action plan will be free. We plan to offer additional premium features for deeper guidance and job search tools.</p>
+        </div>
+        <div class="faq-item reveal">
+          <h3 class="faq-q">What information do I need to use it?</h3>
+          <p class="faq-a">Just the basics — your role, salary, years at your company, state, and layoff date. No sensitive account info or Social Security number required.</p>
+        </div>
+        <div class="faq-item reveal reveal-delay-1">
+          <h3 class="faq-q">Is my data private and secure?</h3>
+          <p class="faq-a">Completely. We never sell your data to third parties, and everything you enter is used only to generate your personal plan.</p>
+        </div>
+        <div class="faq-item reveal">
+          <h3 class="faq-q">I wasn't laid off yet — is this still useful for me?</h3>
+          <p class="faq-a">Absolutely. Many people use it to plan ahead, understand what a hypothetical severance package would look like, or prep for a voluntary job change.</p>
+        </div>
+        <div class="faq-item reveal reveal-delay-1">
+          <h3 class="faq-q">Does this work for people outside tech?</h3>
+          <p class="faq-a">Right now we're focused on tech professionals, but the calculator can provide useful estimates for anyone with a standard employment arrangement.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FINAL CTA ──────────────────────────── -->
+  <section class="final-cta" aria-labelledby="cta-heading">
+    <div class="final-cta-card">
+      <p class="section-label" style="text-align:center">Ready?</p>
+      <h2 class="section-title" id="cta-heading">Don't navigate this<br><em>alone.</em></h2>
+      <p class="section-subtitle">Join the waitlist and be the first to know when the Layoff Calculator launches. We'll email you — nothing else.</p>
+      <form class="final-form" id="footer-form" novalidate aria-label="Waitlist signup">
+        <input type="email" placeholder="[Enter your email address]" required aria-label="Email address" id="footer-email" />
+        <button type="submit">Notify me</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ─── FOOTER ─────────────────────────────── -->
+  <footer role="contentinfo">
+    <div class="footer-inner">
+      <div class="footer-logo">Job<span>flow</span></div>
+      <ul class="footer-links" role="list">
+        <li><a href="#" tabindex="0">Privacy Policy</a></li>
+        <li><a href="#" tabindex="0">Terms of Use</a></li>
+        <li><a href="mailto:[REPLACE: contact@jobflow.com]" tabindex="0">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-inner">
+      <p class="footer-copy">© [REPLACE: YEAR] Jobflow. All rights reserved. Not legal or financial advice — always consult a professional for your specific situation.</p>
+    </div>
+  </footer>
+
+  <script>
+    // ─── NAV: scroll shadow
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 12);
+    }, { passive: true });
+
+    // ─── HAMBURGER MENU
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobile-menu');
+    hamburger.addEventListener('click', () => {
+      const open = mobileMenu.classList.toggle('open');
+      hamburger.setAttribute('aria-expanded', open);
+      document.body.style.overflow = open ? 'hidden' : '';
+    });
+
+    document.querySelectorAll('.mobile-link').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.remove('open');
+        hamburger.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      });
+    });
+
+    // ─── SCROLL REVEAL
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    // ─── FORM HANDLERS
+    function handleFormSubmit(form, emailInput) {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = emailInput.value.trim();
+        if (!email || !email.includes('@')) {
+          emailInput.focus();
+          emailInput.style.borderColor = 'var(--coral)';
+          return;
+        }
+
+        if (form.id === 'hero-form') {
+          document.querySelector('.signup-form-content').style.display = 'none';
+          const successMsg = document.getElementById('success-msg');
+          document.getElementById('confirmed-email').textContent = email;
+          successMsg.style.display = 'block';
+        } else {
+          const btn = form.querySelector('button');
+          btn.textContent = '✓ You\'re on the list!';
+          btn.style.background = '#5a9e5a';
+          btn.disabled = true;
+          emailInput.disabled = true;
+          emailInput.value = email;
+        }
+      });
+
+      emailInput.addEventListener('input', () => {
+        emailInput.style.borderColor = '';
+      });
+    }
+
+    handleFormSubmit(
+      document.getElementById('hero-form'),
+      document.getElementById('hero-email')
+    );
+    handleFormSubmit(
+      document.getElementById('footer-form'),
+      document.getElementById('footer-email')
+    );
+
+    // ─── ANIMATE BAR FILLS ON SCROLL
+    const barFills = document.querySelectorAll('.preview-bar-fill');
+    const barObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.width = entry.target.style.width; // trigger repaint
+        }
+      });
+    }, { threshold: 0.5 });
+    barFills.forEach(el => {
+      const target = el.style.width;
+      el.style.width = '0%';
+      barObserver.observe(el);
+      setTimeout(() => { el.style.width = target; }, 400);
+    });
+
+    // ─── KEYBOARD: close menu on Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && mobileMenu.classList.contains('open')) {
+        mobileMenu.classList.remove('open');
+        hamburger.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+        hamburger.focus();
+      }
+    });
+  </script>
+</body>
+</html>
