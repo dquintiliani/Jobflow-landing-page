@@ -329,24 +329,44 @@
 
   <!-- ─── FINAL CTA ──────────────────────────── -->
   <section class="final-cta" aria-labelledby="cta-heading">
-    <div class="final-cta-card">
-      <p class="section-label" style="text-align:center">Ready?</p>
-      <h2 class="section-title" id="cta-heading">Don't navigate this<br><em>alone.</em></h2>
-      <p class="section-subtitle">Join the waitlist and be the first to know when the Jobflow launches. We'll email you — nothing else.</p>
-      
-      <!-- modify this form HTML and place wherever you want your form -->
-          <form
-            action="https://formspree.io/f/xeelrwnk"
-            method="POST"
-          >
-            <label>
-              Your email:
-              <input type="email" name="email">
-            </label>
+    <div id="signup">
+        <div class="signup-card" role="region" aria-labelledby="form-heading">
+          <div class="signup-form-content">
+            <h2 id="form-heading">Get early access</h2>
+            <p>Be first to try the Jobflow when we launch. No spam, ever.</p>
 
-            <button type="submit">Notify me when its ready</button>
-          </form>
-    </div>
+            <form id="hero-form" action="https://formspree.io/f/xeelrwnk" method="POST">
+              <div class="form-group">
+                <label for="hero-name">Your name</label>
+                <input type="text" id="hero-name" name="name" placeholder="[e.g. Alex Chen]" autocomplete="name" required />
+              </div>
+              <div class="form-group">
+                <label for="hero-email">Work or personal email</label>
+                <input type="email" id="hero-email" name="email" placeholder="[e.g. alex@company.com]" autocomplete="email" required />
+              </div>
+              <div class="form-group">
+                <label for="hero-role">Your situation</label>
+                <div class="select-wrapper">
+                  <select id="hero-role" name="role">
+                    <option value="">Select what describes you best</option>
+                    <option value="laid-off">I was recently laid off</option>
+                    <option value="at-risk">I'm worried about my job security</option>
+                    <option value="exploring">I want to switch jobs</option>
+                    <option value="planning">I'm planning ahead</option>
+                  </select>
+                </div>
+              </div>
+              <button type="submit" class="btn-primary">Notify me when it's ready →</button>
+              <p class="form-disclaimer">By signing up you agree to our <a href="#" tabindex="0">Privacy Policy</a>. We'll only email you about Jobflow.</p>
+            </form>
+          </div>
+          <div class="success-msg" id="success-msg" role="alert" aria-live="polite">
+            <div class="success-icon" aria-hidden="true">🎉</div>
+            <h3>You're on the list!</h3>
+            <p>We'll email you at <strong id="confirmed-email"></strong> as soon as Jobflow is ready to try.</p>
+          </div>
+        </div>
+      </div>
   </section>
 
   <!-- ─── FOOTER ─────────────────────────────── -->
