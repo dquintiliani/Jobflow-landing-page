@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Jobflow — Layoff Calculator</title>
+  <title>Jobflow — Jobflow</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,300&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
@@ -49,26 +49,19 @@
     <div class="hero-inner">
       <div class="hero-content">
         <div class="hero-badge" role="status" aria-label="Product status">Coming soon — join the waitlist</div>
-        <p class="hero-eyebrow">Jobflow · Layoff Calculator</p>
+        <p class="hero-eyebrow">Jobflow</p>
         <h1 id="hero-heading">Know exactly<br>what comes <em>next.</em></h1>
         <p class="hero-tagline">
-          Getting laid off is stressful. Figuring out your finances, benefits, and next move shouldn't be. The Layoff Calculator gives tech professionals a clear, personalized action plan — so you can move forward with confidence.
+          Getting laid off is stressful. Figuring out your finances, benefits, and next move shouldn't be. The Jobflow gives tech professionals a clear, personalized action plan — so you can move forward with confidence.
         </p>
-        <div class="social-proof" aria-label="Waitlist signups">
-          <div class="sp-avatars" aria-hidden="true">
-            <span title="[REPLACE: Avatar initials]">MK</span>
-            <span title="[REPLACE: Avatar initials]">JS</span>
-            <span title="[REPLACE: Avatar initials]">AL</span>
-            <span title="[REPLACE: Avatar initials]">+</span>
-          </div>
-        </div>
+        
       </div>
 
       <div id="signup">
         <div class="signup-card" role="region" aria-labelledby="form-heading">
           <div class="signup-form-content">
             <h2 id="form-heading">Get early access</h2>
-            <p>Be first to try the Layoff Calculator when we launch. No spam, ever.</p>
+            <p>Be first to try the Jobflow when we launch. No spam, ever.</p>
 
             <form id="hero-form" novalidate>
               <div class="form-group">
@@ -209,7 +202,7 @@
       </div>
 
       <!-- Illustrative UI Preview -->
-      <div class="preview-ui reveal" aria-label="Layoff Calculator dashboard preview" role="img">
+      <div class="preview-ui reveal" aria-label="Jobflow dashboard preview" role="img">
         <div class="preview-header" aria-hidden="true">
           <div class="preview-dots">
             <span></span><span></span><span></span>
@@ -309,7 +302,7 @@
 
       <div class="faq-grid">
         <div class="faq-item reveal">
-          <h3 class="faq-q">When will the Layoff Calculator be ready?</h3>
+          <h3 class="faq-q">When will the Jobflow be ready?</h3>
           <p class="faq-a">We're currently in development and plan to begin beta testing soon. Sign up for the waitlist and you'll be among the first to get access.</p>
         </div>
         <div class="faq-item reveal reveal-delay-1">
@@ -341,11 +334,24 @@
     <div class="final-cta-card">
       <p class="section-label" style="text-align:center">Ready?</p>
       <h2 class="section-title" id="cta-heading">Don't navigate this<br><em>alone.</em></h2>
-      <p class="section-subtitle">Join the waitlist and be the first to know when the Layoff Calculator launches. We'll email you — nothing else.</p>
-      <form class="final-form" id="footer-form" novalidate aria-label="Waitlist signup">
-        <input type="email" placeholder="[Enter your email address]" required aria-label="Email address" id="footer-email" />
-        <button type="submit">Notify me</button>
-      </form>
+      <p class="section-subtitle">Join the waitlist and be the first to know when the Jobflow launches. We'll email you — nothing else.</p>
+      
+      <!-- modify this form HTML and place wherever you want your form -->
+          <form
+            action="https://formspree.io/f/xeelrwnk"
+            method="POST"
+          >
+            <label>
+              Your email:
+              <input type="email" name="email">
+            </label>
+            <label>
+              Your message:
+              <textarea name="message"></textarea>
+            </label>
+            
+            <button type="submit">Send</button>
+          </form>
     </div>
   </section>
 
@@ -360,7 +366,7 @@
       </ul>
     </div>
     <div class="footer-inner">
-      <p class="footer-copy">© [REPLACE: YEAR] Jobflow. All rights reserved. Not legal or financial advice — always consult a professional for your specific situation.</p>
+      <p class="footer-copy">© 2026 Jobflow. All rights reserved. Not legal or financial advice — always consult a professional for your specific situation.</p>
     </div>
   </footer>
 
