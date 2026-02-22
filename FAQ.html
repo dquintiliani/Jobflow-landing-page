@@ -1138,45 +1138,29 @@
 
         <div class="contact-right">
           <div class="contact-form-content">
-            <form id="contact-form" novalidate aria-label="Ask a question">
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="cf-first">First name</label>
-                  <input type="text" id="cf-first" name="first_name" placeholder="[e.g. Alex]" autocomplete="given-name" required />
-                </div>
-                <div class="form-group">
-                  <label for="cf-last">Last name</label>
-                  <input type="text" id="cf-last" name="last_name" placeholder="[e.g. Chen]" autocomplete="family-name" />
-                </div>
-              </div>
-
+            <form id="hero-form" action="https://formspree.io/f/xeelrwnk" method="POST">
               <div class="form-group">
-                <label for="cf-email">Email address</label>
-                <input type="email" id="cf-email" name="email" placeholder="[e.g. alex@email.com]" autocomplete="email" required />
+                <label for="hero-name">Your name</label>
+                <input type="text" id="hero-name" name="name" placeholder="[e.g. Alex Chen]" autocomplete="name" required />
               </div>
-
               <div class="form-group">
-                <label for="cf-type">What's this about?</label>
+                <label for="hero-email">Work or personal email</label>
+                <input type="email" id="hero-email" name="email" placeholder="[e.g. alex@company.com]" autocomplete="email" required />
+              </div>
+              <div class="form-group">
+                <label for="hero-role">Your situation</label>
                 <div class="select-wrapper">
-                  <select id="cf-type" name="type">
-                    <option value="">Select a topic</option>
-                    <option value="general">General question about Jobflow</option>
-                    <option value="product">Question about the Jobflow</option>
-                    <option value="privacy">Privacy or data question</option>
-                    <option value="feature">Feature suggestion or feedback</option>
-                    <option value="partnership">Partnership or referral inquiry</option>
-                    <option value="other">Something else</option>
+                  <select id="hero-role" name="role">
+                    <option value="">Select what describes you best</option>
+                    <option value="laid-off">I was recently laid off</option>
+                    <option value="at-risk">I'm worried about my job security</option>
+                    <option value="exploring">I want to switch jobs</option>
+                    <option value="planning">I'm planning ahead</option>
                   </select>
                 </div>
               </div>
-
-              <div class="form-group">
-                <label for="cf-message">Your question</label>
-                <textarea id="cf-message" name="message" rows="5" placeholder="[What would you like to know? The more context you give us, the better we can help.]" required></textarea>
-              </div>
-
-              <button type="submit" class="btn-primary" id="submit-btn">Send your question →</button>
-              <p class="form-note">We treat your message with complete confidentiality.</p>
+              <button type="submit" class="btn-primary">Notify me when it's ready →</button>
+              <p class="form-disclaimer">By signing up you agree to our <a href="#" tabindex="0">Privacy Policy</a>. We'll only email you about Jobflow.</p>
             </form>
           </div>
 
